@@ -350,9 +350,7 @@ evolution_elimination_parser = RagasoutputParser(pydantic_object=EvolutionElimin
 
 context_scoring_prompt = Prompt(
     name="score_context",
-    instruction="""
-    Given a context, perform the following task and output the answer in VALID JSON format: Assess the provided context and assign a numerical score of 1 (Low), 2 (Medium), or 3 (High) for each of the following criteria in your JSON response:
-
+    instruction="""Given a context, perform the following task and output the answer in VALID JSON format: Assess the provided context and assign a numerical score of 1 (Low), 2 (Medium), or 3 (High) for each of the following criteria in your JSON response:
 clarity: Evaluate the precision and understandability of the information presented. High scores (3) are reserved for contexts that are both precise in their information and easy to understand. Low scores (1) are for contexts where the information is vague or hard to comprehend.
 depth: Determine the level of detailed examination and the inclusion of innovative insights within the context. A high score indicates a comprehensive and insightful analysis, while a low score suggests a superficial treatment of the topic.
 structure: Assess how well the content is organized and whether it flows logically. High scores are awarded to contexts that demonstrate coherent organization and logical progression, whereas low scores indicate a lack of structure or clarity in progression.

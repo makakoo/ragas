@@ -342,6 +342,9 @@ class TestsetGenerator:
             self.init_evolution(evolution)
             evolution.init()
             evolution.adapt(language, cache_dir=cache_dir)
+            evolution.save(cache_dir=cache_dir)
+
+        self.save(evolutions=evolutions, cache_dir=cache_dir)
 
     def save(
         self, evolutions: t.List[Evolution], cache_dir: t.Optional[str] = None

@@ -181,13 +181,13 @@ class Prompt(BaseModel):
 
         # TODO: Add callbacks
         cache_dir = cache_dir if cache_dir else get_cache_dir()
-        if os.path.exists(os.path.join(cache_dir, language, f"{self.name}.json")):
-            self_cp = self._load(language, self.name, cache_dir)
+        # if os.path.exists(os.path.join(cache_dir, language, f"{self.name}.json")):
+        #     self_cp = self._load(language, self.name, cache_dir)
 
-            self.language = self_cp.language
-            self.examples = self_cp.examples
+        #     self.language = self_cp.language
+        #     self.examples = self_cp.examples
 
-            return self_cp
+        #     return self_cp
 
         logger.info("Adapting %s to %s", self.name, language)
         prompts = []
@@ -210,16 +210,16 @@ class Prompt(BaseModel):
                     translate_to=language, input=example.get(self.output_key)
                 )
             )
-            if self.output_type.lower() == "json":
-                output = example.get(self.output_key)
-                if isinstance(output, str):
-                    output = json.loads(output)
-                if isinstance(output, dict):
-                    output_keys.append(get_all_keys(output))
-                elif isinstance(output, list) and all(
-                    isinstance(item, dict) for item in output
-                ):
-                    output_keys.append([get_all_keys(item) for item in output])
+            # if self.output_type.lower() == "json":
+            #     output = example.get(self.output_key)
+            #     if isinstance(output, str):
+            #         output = json.loads(output)
+            #     if isinstance(output, dict):
+            #         output_keys.append(get_all_keys(output))
+            #     elif isinstance(output, list) and all(
+            #         isinstance(item, dict) for item in output
+            #     ):
+            #         output_keys.append([get_all_keys(item) for item in output])
 
         # NOTE: this is a slow loop, consider Executor to fasten this
         results = []
@@ -239,7 +239,7 @@ class Prompt(BaseModel):
                 {k: v for k, v in zip(self.input_keys, example[: len(self.input_keys)])}
             )
             if self.output_type.lower() == "json":
-                example_dict[self.output_key] = json_loader._safe_load(example[-1], llm)
+                example_dict[self.output_key] = json_loader._asafe_load(example[-1], llm)
                 if example_dict[self.output_key] == {}:
                     # Extracting the dictionary part using string slicing
                     dict_str = example[-1].split("(")[0].strip()
