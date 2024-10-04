@@ -179,7 +179,7 @@ class LlamaIndexEmbeddingsWrapper(BaseRagasEmbeddings):
 
 
 def embedding_factory(
-    model: str = "text-embedding-ada-002", run_config: t.Optional[RunConfig] = None
+    model: str = "text-embedding-3-small", run_config: t.Optional[RunConfig] = None
 ) -> BaseRagasEmbeddings:
     openai_embeddings = OpenAIEmbeddings(model=model)
     if run_config is not None:
