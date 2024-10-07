@@ -294,17 +294,21 @@ def llm_factory(
     run_config: t.Optional[RunConfig] = None,
     default_headers: t.Optional[t.Dict[str, str]] = None,
     base_url: t.Optional[str] = None,
+    model_kwargs: t.Optional[t.Dict[str, t.Any]] = None,  # New parameter
 ) -> BaseRagasLLM:
     timeout = None
     if run_config is not None:
         timeout = run_config.timeout
-
     # if helicone is enabled, use the helicone
     if helicone_config.is_enabled:
         default_headers = helicone_config.default_headers()
         base_url = helicone_config.base_url
 
     openai_model = ChatOpenAI(
-        model=model, timeout=timeout, default_headers=default_headers, base_url=base_url
+        model=model,
+        timeout=timeout,
+        default_headers=default_headers,
+        base_url=base_url,
+        model_kwargs=model_kwargs,  # Include model_kwargs here
     )
     return LangchainLLMWrapper(openai_model, run_config)

@@ -179,11 +179,16 @@ class LlamaIndexEmbeddingsWrapper(BaseRagasEmbeddings):
 
 
 def embedding_factory(
-    model: str = "text-embedding-3-small", run_config: t.Optional[RunConfig] = None
+    model: str = "text-embedding-3-small",
+    run_config: t.Optional[RunConfig] = None,
+    model_kwargs: t.Optional[t.Dict[str, t.Any]] = None,  # Unified parameter
 ) -> BaseRagasEmbeddings:
-    openai_embeddings = OpenAIEmbeddings(model=model)
+    model_kwargs = model_kwargs or {}  # Default to an empty dictionary if None
+    openai_embeddings = OpenAIEmbeddings(model=model, **model_kwargs)  # Apply model_kwargs
+
     if run_config is not None:
         openai_embeddings.request_timeout = run_config.timeout
     else:
         run_config = RunConfig()
+
     return LangchainEmbeddingsWrapper(openai_embeddings, run_config=run_config)
