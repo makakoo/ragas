@@ -11,7 +11,7 @@ from langchain_core.language_models import BaseLanguageModel as LangchainLLM
 
 from ragas._analytics import EvaluationEvent, track, track_was_completed
 from ragas.callbacks import new_group
-from ragas.cost import TokenUsage
+from ragas.cost import TokenUsage, CostCallbackHandler  # Ensure CostCallbackHandler is properly imported
 from ragas.dataset_schema import EvaluationDataset, MultiTurnSample, SingleTurnSample
 from ragas.embeddings.base import (
     BaseRagasEmbeddings,
@@ -48,8 +48,7 @@ from ragas.validation import (
 
 if t.TYPE_CHECKING:
     from langchain_core.callbacks import Callbacks
-
-    from ragas.cost import CostCallbackHandler, TokenUsageParser
+    from ragas.cost import TokenUsageParser
 
 RAGAS_EVALUATION_CHAIN_NAME = "ragas evaluation"
 
@@ -159,7 +158,6 @@ def evaluate(
     ragas_callbacks: t.Dict[str, BaseCallbackHandler] = {}
 
     if token_usage_parser is not None:
-        from ragas.cost import CostCallbackHandler
         cost_cb = CostCallbackHandler(token_usage_parser=token_usage_parser)
         ragas_callbacks["cost_cb"] = cost_cb
 
