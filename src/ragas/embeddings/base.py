@@ -181,14 +181,22 @@ class LlamaIndexEmbeddingsWrapper(BaseRagasEmbeddings):
 def embedding_factory(
     model: str = "text-embedding-3-small",
     run_config: t.Optional[RunConfig] = None,
-    model_kwargs: t.Optional[t.Dict[str, t.Any]] = None,  # Unified parameter
+    model_kwargs: t.Optional[t.Dict[str, t.Any]] = None,
 ) -> BaseRagasEmbeddings:
     model_kwargs = model_kwargs or {}  # Default to an empty dictionary if None
-    openai_embeddings = OpenAIEmbeddings(model=model, **model_kwargs)  # Apply model_kwargs
+    # Extract the 'user' parameter if present, and handle it separately
+    user = model_kwargs.pop("user", None)
+
+    # Pass only the parameters recognized by OpenAIEmbeddings
+    openai_embeddings = OpenAIEmbeddings(model=model, **model_kwargs)
 
     if run_config is not None:
         openai_embeddings.request_timeout = run_config.timeout
     else:
         run_config = RunConfig()
 
-    return LangchainEmbeddingsWrapper(openai_embeddings, run_config=run_config)
+    # Wrap the embeddings with a custom class to add 'user' functionality if needed
+    wrapper = LangchainEmbeddingsWrapper(openai_embeddings, run_config=run_config)
+    wrapper.user = user  # Store 'user' parameter in the wrapper if required for later use
+
+    return wrapper
