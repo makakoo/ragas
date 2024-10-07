@@ -12,6 +12,7 @@ from langchain_openai.embeddings import OpenAIEmbeddings
 from pydantic.dataclasses import dataclass
 
 from ragas.run_config import RunConfig, add_async_retry, add_retry
+import warnings
 
 if t.TYPE_CHECKING:
     from llama_index.core.base.embeddings.base import BaseEmbedding
@@ -177,28 +178,19 @@ class LlamaIndexEmbeddingsWrapper(BaseRagasEmbeddings):
     async def aembed_documents(self, texts: t.List[str]) -> t.List[t.List[float]]:
         return await self.embeddings.aget_text_embedding_batch(texts)
 
-
 def embedding_factory(
     model: str = "text-embedding-3-small",
     run_config: t.Optional[RunConfig] = None,
     model_kwargs: t.Optional[t.Dict[str, t.Any]] = None,
 ) -> BaseRagasEmbeddings:
     model_kwargs = model_kwargs or {}  # Default to an empty dictionary if None
+    run_config = run_config or RunConfig()  # Initialize run_config if None
 
-    # Extract the 'user' parameter if present
-    user = model_kwargs.pop("user", None)
+    # Suppress the specific warning about the "user" parameter
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message=".*user.*")
+        openai_embeddings = OpenAIEmbeddings(model=model, **model_kwargs)
 
-    # Pass only the parameters recognized by OpenAIEmbeddings
-    openai_embeddings = OpenAIEmbeddings(model=model, **model_kwargs)
+    openai_embeddings.request_timeout = run_config.timeout
 
-    if run_config is not None:
-        openai_embeddings.request_timeout = run_config.timeout
-    else:
-        run_config = RunConfig()
-
-    # Wrap the embeddings and add the user info if applicable
-    wrapper = LangchainEmbeddingsWrapper(openai_embeddings, run_config=run_config)
-    if user:
-        wrapper.embeddings.user = user  # Store the user info in the embeddings
-
-    return wrapper
+    return LangchainEmbeddingsWrapper(openai_embeddings, run_config=run_config)
