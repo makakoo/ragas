@@ -184,7 +184,8 @@ def embedding_factory(
     model_kwargs: t.Optional[t.Dict[str, t.Any]] = None,
 ) -> BaseRagasEmbeddings:
     model_kwargs = model_kwargs or {}  # Default to an empty dictionary if None
-    # Extract the 'user' parameter if present, and handle it separately
+
+    # Extract the 'user' parameter if present
     user = model_kwargs.pop("user", None)
 
     # Pass only the parameters recognized by OpenAIEmbeddings
@@ -195,8 +196,9 @@ def embedding_factory(
     else:
         run_config = RunConfig()
 
-    # Wrap the embeddings with a custom class to add 'user' functionality if needed
+    # Wrap the embeddings and add the user info if applicable
     wrapper = LangchainEmbeddingsWrapper(openai_embeddings, run_config=run_config)
-    wrapper.user = user  # Store 'user' parameter in the wrapper if required for later use
+    if user:
+        wrapper.embeddings.user = user  # Store the user info in the embeddings
 
     return wrapper
